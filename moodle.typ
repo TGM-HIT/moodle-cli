@@ -8,6 +8,17 @@
     set page(width: 14cm, height: auto, margin: 1cm)
     set text(font: "Noto Sans")
 
+    show quote.where(block: true): it => {
+      show: block.with(
+        width: 100%,
+        stroke: (left: 5pt+rgb("#adb5bd")),
+        inset: (left: 1em, y: 4pt),
+      )
+      set text(rgb("#495057"))
+
+      it
+    }
+
     show raw.where(block: true): it => {
       show: block.with(
         width: 100%,

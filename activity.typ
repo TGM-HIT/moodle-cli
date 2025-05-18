@@ -2,6 +2,12 @@
 
 #show: moodle.setup()
 
+#quote(block: true)[
+  asdf
+]
+
+Hello `World`
+
 ...
 
 ```java
