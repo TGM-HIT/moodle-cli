@@ -1,7 +1,14 @@
-#import "c4l.typ"
-#import "generico.typ"
+#import "moodle.typ" as moodle: c4l, generico
 
-#show: c4l.setup()
+#show: moodle.setup()
+
+...
+
+```java
+public static void main(String[] args) {
+
+}
+```
 
 ...
 

@@ -2,16 +2,6 @@
 #import "htmlx.typ"
 #import "c4l-util.typ"
 
-#let setup() = util.target-conditional.with(
-  paged: doc => {
-    set page(width: 14cm, height: auto, margin: 1cm)
-    set text(font: "Noto Sans")
-
-    doc
-  },
-  default: doc => doc,
-)
-
 #let key-concept = util.target-conditional.with(
   paged: body => {
     show: c4l-util.block.with(
