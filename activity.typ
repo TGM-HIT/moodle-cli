@@ -10,6 +10,18 @@ Hello `World`
 
 ...
 
+#figure(
+  moodle.frame({
+    rect("Hello")
+  })
+)
+
+#figure(
+  moodle.frame(image("super-advocado.jpg"))
+)
+
+...
+
 ```java
 public static void main(String[] args) {
 

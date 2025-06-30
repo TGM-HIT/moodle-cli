@@ -46,3 +46,8 @@
     doc
   },
 )
+
+#let frame = util.target-conditional.with(
+  paged: body => body,
+  html: body => html.frame(body),
+)
