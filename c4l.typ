@@ -119,7 +119,7 @@
         inset: (x: 12pt, y: 8pt),
       )
 
-      fa-icon(icon, 1.5em, green)
+      fa-icon(icon, 1.5em, fill)
     }
 
     {
