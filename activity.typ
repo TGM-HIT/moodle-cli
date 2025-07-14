@@ -1,6 +1,6 @@
-#import "moodle.typ" as moodle: c4l, generico
+#import "@local/moodular:0.0.1" as moodular: c4l, generico
 
-#show: moodle.setup()
+#show: moodular.setup()
 
 #quote(block: true)[
   asdf
@@ -11,13 +11,13 @@ Hello `World`
 ...
 
 #figure(
-  moodle.frame({
+  moodular.frame({
     rect("Hello")
   })
 )
 
 #figure(
-  moodle.frame(image("super-advocado.jpg"))
+  moodular.frame(image("super-advocado.jpg"))
 )
 
 ...
@@ -34,7 +34,7 @@ public static void main(String[] args) {
 
 ...
 
-#c4l.quote[C4L Quogte #lorem(50)]
+#c4l.quote[C4L Quote #lorem(50)]
 
 ...
 
