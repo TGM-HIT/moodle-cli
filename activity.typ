@@ -1,5 +1,10 @@
 #import "@local/moodular:0.0.1" as moodular: c4l, generico
 
+#metadata((
+  mod: "page",
+  cmid: 2,
+))<frontmatter>
+
 #show: moodular.setup()
 
 #quote(block: true)[
