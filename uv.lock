@@ -125,6 +125,7 @@ source = { virtual = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "moodlepy" },
+    { name = "requests" },
     { name = "typst" },
 ]
 
@@ -132,6 +133,7 @@ dependencies = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "moodlepy", specifier = ">=0.24.1" },
+    { name = "requests", specifier = ">=2.32.3" },
     { name = "typst", specifier = ">=0.13.3" },
 ]
 
