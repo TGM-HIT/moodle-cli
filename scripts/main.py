@@ -18,7 +18,10 @@ def process(filename: str):
     return metadata, soup.body.decode_contents()
 
 
-def upload_page(url: str, token: str, *, cmid: int, intro: dict, page: dict):
+def upload_page(url: str, token: str, *, cmid: int, intro: dict=None, page: dict):
+    if intro is None:
+        intro = dict(text='')
+
     moodle = Moodle(url, token)
     result = moodle('local_modcontentservice_update_page_content', cmid=cmid, intro=intro, page=page)
     return result
@@ -63,11 +66,11 @@ if __name__ == '__main__':
 
     result = upload_page(url, token,
         cmid=2,
-        intro=dict(
-            text='This is the intro',
-            # format=1,
-            # itemid=-1,
-        ),
+        # intro=dict(
+        #     text='This is the intro',
+        #     # format=1,
+        #     # itemid=-1,
+        # ),
         page=dict(
             text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',
             # format=1,
