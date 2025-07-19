@@ -47,10 +47,19 @@ if __name__ == '__main__':
     # ))
     # print(result)
 
+    # result = moodle.upload_files(
+    #     ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
+    # )
+    # itemid = result[0]['itemid']
+
+    # result = moodle.modcontentservice.update_resource_content(cmid=3, files=itemid)
+    # print(result)
+
     result = moodle.upload_files(
+        ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
         ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     )
     itemid = result[0]['itemid']
 
-    result = moodle.modcontentservice.update_resource_content(cmid=3, files=itemid)
+    result = moodle.modcontentservice.update_folder_content(cmid=4, files=itemid, intro=dict(text='test'))
     print(result)
