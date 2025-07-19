@@ -36,24 +36,21 @@ if __name__ == '__main__':
     # )
     # print(result)
 
-    result = moodle.upload_files(
-        ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
-        # ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
-    )
-    itemid = result[0]['itemid']
+    # result = moodle.upload_files(
+    #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
+    # )
+    # itemid = result[0]['itemid']
+
+    # result = moodle.modcontentservice.update_page_content(cmid=2, page=dict(
+    #     text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',
+    #     itemid=itemid,
+    # ))
     # print(result)
 
-    result = moodle.modcontentservice.update_page_content(
-        cmid=2,
-        # intro=dict(
-        #     text='This is the intro',
-        #     # format=1,
-        #     # itemid=-1,
-        # ),
-        page=dict(
-            text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',
-            # format=1,
-            itemid=itemid,
-        ),
+    result = moodle.upload_files(
+        ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     )
+    itemid = result[0]['itemid']
+
+    result = moodle.modcontentservice.update_resource_content(cmid=3, files=itemid)
     print(result)

@@ -15,6 +15,18 @@ class ModContentService(BaseMoodle):
         )
         return data
 
+    def update_resource_content(self, *, cmid: int, intro: dict=None, files: int):
+        if intro is None:
+            intro = dict(text='')
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_resource_content",
+            cmid=cmid,
+            intro=intro,
+            files=files,
+        )
+        return data
+
 
 class Moodle(_Moodle):
     def __init__(self, url: str, token: str):
