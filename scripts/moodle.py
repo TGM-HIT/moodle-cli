@@ -24,3 +24,19 @@ class Moodle(_Moodle):
     @lazy
     def modcontentservice(self) -> ModContentService:
         return ModContentService(self)
+
+    def upload_files(self, *files, itemid: int = 0, filepath: str = '/'):
+        url = self.url.replace('/webservice/rest/server.php', '/webservice/upload.php')
+        token = self.token
+
+        r = self.session.post(
+            url,
+            params={
+                'token': token,
+                'itemid': itemid,
+                'filepath': filepath,
+            },
+            files={f'file_{i}': file for i, file in enumerate(files, start=1)},
+        )
+        r.raise_for_status()
+        return r.json()

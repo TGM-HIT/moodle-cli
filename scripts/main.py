@@ -19,20 +19,6 @@ def process(filename: str):
 
     return metadata, soup.body.decode_contents()
 
-
-def upload_files(*files, itemid = 0, filepath = '/'):
-    r = requests.post(
-        f'{base_url}/webservice/upload.php',
-        params={
-            'token': token,
-            'itemid': itemid,
-            'filepath': filepath,
-        },
-        files={ f'file_{i}': file for i, file in enumerate(files, start=1) },
-    )
-    r.raise_for_status()
-    return r.json()
-
 if __name__ == '__main__':
     # if len(sys.argv) < 2:
     #     print("Usage: python main.py <filename>")
@@ -50,7 +36,7 @@ if __name__ == '__main__':
     # )
     # print(result)
 
-    result = upload_files(
+    result = moodle.upload_files(
         ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
         # ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     )
