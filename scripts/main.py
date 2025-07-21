@@ -8,7 +8,7 @@ import typst
 
 base_url = 'http://localhost:8000'
 url = f'{base_url}/webservice/rest/server.php'
-token = '3b29d57634d4a547d48f52638b374a30'
+token = '3ed7c2b8bfe177b6d4f17d1a6596ae79'
 
 moodle = Moodle(url, token)
 
@@ -55,11 +55,27 @@ if __name__ == '__main__':
     # result = moodle.modcontentservice.update_resource_content(cmid=3, files=itemid)
     # print(result)
 
+    # result = moodle.upload_files(
+    #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
+    #     ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
+    # )
+    # itemid = result[0]['itemid']
+
+    # result = moodle.modcontentservice.update_folder_content(cmid=4, files=itemid, intro=dict(text='test'))
+    # print(result)
+
     result = moodle.upload_files(
         ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
-        ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     )
     itemid = result[0]['itemid']
 
-    result = moodle.modcontentservice.update_folder_content(cmid=4, files=itemid, intro=dict(text='test'))
+    result = moodle.upload_files(
+        ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
+    )
+    att_itemid = result[0]['itemid']
+
+    result = moodle.modcontentservice.update_assign_content(cmid=5, intro=dict(
+        text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',
+        itemid=itemid,
+    ), attachments=att_itemid)
     print(result)

@@ -39,6 +39,23 @@ class ModContentService(BaseMoodle):
         )
         return data
 
+    def update_assign_content(self, *, cmid: int, intro: dict=None, activity: dict=None, attachments: int=None):
+        if intro is None:
+            intro = dict(text='')
+        if activity is None:
+            activity = dict(text='')
+        if attachments is None:
+            attachments = 0
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_assign_content",
+            cmid=cmid,
+            intro=intro,
+            activity=activity,
+            attachments=attachments,
+        )
+        return data
+
 
 class Moodle(_Moodle):
     def __init__(self, url: str, token: str):
