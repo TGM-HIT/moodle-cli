@@ -1,7 +1,7 @@
 #import "@local/moodular:0.0.1" as moodular: c4l, generico
 
 #metadata((
-  mod: "page",
+  mod: "assign",
   cmid: 2,
 ))<frontmatter>
 
