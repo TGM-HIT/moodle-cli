@@ -37,10 +37,10 @@ if __name__ == '__main__':
     )
     print(result)
 
-    # result = moodle.upload_files(
+    # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
     # )
-    # itemid = result[0]['itemid']
+    # itemid = result[0].itemid
 
     # result = moodle.modcontentservice.update_page_content(cmid=2, page=dict(
     #     text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',
@@ -48,32 +48,32 @@ if __name__ == '__main__':
     # ))
     # print(result)
 
-    # result = moodle.upload_files(
+    # result = moodle.upload(
     #     ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     # )
-    # itemid = result[0]['itemid']
+    # itemid = result[0].itemid
 
     # result = moodle.modcontentservice.update_resource_content(cmid=3, files=itemid)
     # print(result)
 
-    # result = moodle.upload_files(
+    # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
     #     ('Apothecary.jpg', open('/home/clemens/Pictures/WerewolfDarkArts/cropped/Apothecary.jpg', 'rb')),
     # )
-    # itemid = result[0]['itemid']
+    # itemid = result[0].itemid
 
     # result = moodle.modcontentservice.update_folder_content(cmid=4, files=itemid, intro=dict(text='test'))
     # print(result)
 
-    # result = moodle.upload_files(
+    # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
     # )
-    # itemid = result[0]['itemid']
+    # itemid = result[0].itemid
 
-    # result = moodle.upload_files(
+    # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
     # )
-    # att_itemid = result[0]['itemid']
+    # att_itemid = result[0].itemid
 
     # result = moodle.modcontentservice.update_assign_content(cmid=2, intro=dict(
     #     text='<p><img class="img-fluid" src="@@PLUGINFILE@@/super-advocado.jpg" alt="advocado" width="1024" height="1024"></p>',

@@ -10,3 +10,6 @@ dependencies = [
     "requests>=2.32.3",
     "typst>=0.13.3",
 ]
+
+[tool.uv.sources]
+moodlepy = { git = "https://github.com/SillyFreak/moodlepy", branch = "improvements" }
