@@ -1,9 +1,16 @@
 #import "@local/moodular:0.0.1" as moodular: c4l, generico
 
-#metadata((
-  mod: "assign",
-  cmid: 2,
-))<frontmatter>
+#let attachments = state("attachments", ())
+#let attachment(source) = attachments.update(arr => (..arr, source))
+
+#context {
+  let frontmatter = (
+    mod: "assign",
+    cmid: 2,
+    attachments: attachments.final(),
+  )
+  [#metadata(frontmatter)<frontmatter>]
+}
 
 #show: moodular.setup()
 
@@ -21,9 +28,8 @@ Hello `World`
   })
 )
 
-#figure(
-  moodular.frame(image("super-advocado.jpg"))
-)
+#attachment("super-advocado.jpg")
+#image("super-advocado.jpg", alt: "Advocado")
 
 ...
 

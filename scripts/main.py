@@ -30,10 +30,19 @@ if __name__ == '__main__':
     if metadata['mod'] != 'assign':
         raise ValueError(f"Unsupported module type: {metadata['mod']}")
 
+    if len(metadata['attachments']) != 0:
+        result = moodle.upload(*(
+            (filename, open(filename, 'rb'))
+            for filename in set(metadata['attachments'])
+        ))
+        itemid = result[0].itemid
+    else:
+        itemid = None
+
     result = moodle.modcontentservice.update_assign_content(
         cmid=metadata['cmid'],
         intro=dict(text=body),
-        # attachments=...,
+        attachments=itemid,
     )
     print(result)
 
