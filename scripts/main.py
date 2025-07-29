@@ -1,4 +1,5 @@
 import json
+from pathlib import Path
 import sys
 
 from bs4 import BeautifulSoup
@@ -25,15 +26,15 @@ if __name__ == '__main__':
         print("Usage: python main.py <filename>")
         sys.exit(1)
 
-    filename = sys.argv[1]
+    filename = Path(sys.argv[1])
     metadata, body = process(filename)
     if metadata['mod'] != 'assign':
         raise ValueError(f"Unsupported module type: {metadata['mod']}")
 
     if len(metadata['attachments']) != 0:
         result = moodle.upload(*(
-            (filename, open(filename, 'rb'))
-            for filename in set(metadata['attachments'])
+            (attachment, open(filename.parent/attachment, 'rb'))
+            for attachment in set(metadata['attachments'])
         ))
         itemid = result[0].itemid
     else:
