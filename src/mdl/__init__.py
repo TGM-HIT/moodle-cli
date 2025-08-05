@@ -21,60 +21,31 @@ def process(filename: str):
 
     return metadata, body
 
-def list_my_courses(editable=True):
-    if editable:
-        return moodle.core.course.search_courses("search", "", requiredcapabilities=['moodle/course:manageactivities'])
-    else:
-        return moodle.core.course.search_courses("search", "", limittoenrolled=1)
-
-def get_course_contents(courseid):
-    return moodle.core.course.get_contents(courseid)
-
-def get_course_module(cmid, courseid=None):
-    module = moodle.core.course.get_course_module(cmid)
-    if courseid is not None and module.cm.course != courseid:
-        raise ValueError("cmid does not belong to the given course")
-    return module
-
 def main():
-    print(f"Courses:")
-    for course in list_my_courses().courses:
-        print(f"- {course.displayname} (ID={course.id})")
+    if len(sys.argv) < 2:
+        print("Usage: python main.py <filename>")
+        sys.exit(1)
 
-    print(f"Test Course Contents:")
-    for section in get_course_contents(2):
-        print(f"- {section.section}: {section.name} (ID={section.id}){" (hidden)" if not section.visible else ""}")
-        for module in section.modules:
-            print(module)
-            print(f"  - {module.name} (mod_{module.modname}, ID={module.id}){" (hidden)" if not section.visible else ""}")
+    filename = Path(sys.argv[1])
+    metadata, body = process(filename)
+    if metadata['mod'] != 'assign':
+        raise ValueError(f"Unsupported module type: {metadata['mod']}")
 
-    print(f"Test Assignment:")
-    print(get_course_module(2, courseid=2))
+    if len(metadata['attachments']) != 0:
+        result = moodle.upload(*(
+            (attachment, open(filename.parent/attachment, 'rb'))
+            for attachment in set(metadata['attachments'])
+        ))
+        itemid = result[0].itemid
+    else:
+        itemid = None
 
-    # if len(sys.argv) < 2:
-    #     print("Usage: python main.py <filename>")
-    #     sys.exit(1)
-
-    # filename = Path(sys.argv[1])
-    # metadata, body = process(filename)
-    # if metadata['mod'] != 'assign':
-    #     raise ValueError(f"Unsupported module type: {metadata['mod']}")
-
-    # if len(metadata['attachments']) != 0:
-    #     result = moodle.upload(*(
-    #         (attachment, open(filename.parent/attachment, 'rb'))
-    #         for attachment in set(metadata['attachments'])
-    #     ))
-    #     itemid = result[0].itemid
-    # else:
-    #     itemid = None
-
-    # result = moodle.modcontentservice.update_assign_content(
-    #     cmid=metadata['cmid'],
-    #     intro=dict(text=body),
-    #     attachments=itemid,
-    # )
-    # print(result)
+    result = moodle.modcontentservice.update_assign_content(
+        cmid=metadata['cmid'],
+        intro=dict(text=body),
+        attachments=itemid,
+    )
+    print(result)
 
     # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
