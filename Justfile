@@ -5,3 +5,6 @@ show-course:
 	uv run mdl courses
 	uv run mdl contents 2
 	uv run mdl module 2
+
+test:
+	@uv run mdl test
