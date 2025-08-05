@@ -36,7 +36,7 @@ def get_course_module(cmid, courseid=None):
         raise ValueError("cmid does not belong to the given course")
     return module
 
-if __name__ == '__main__':
+def main():
     print(f"Courses:")
     for course in list_my_courses().courses:
         print(f"- {course.displayname} (ID={course.id})")
@@ -119,3 +119,6 @@ if __name__ == '__main__':
     #     itemid=itemid,
     # ), attachments=att_itemid)
     # print(result)
+
+if __name__ == '__main__':
+    main()
