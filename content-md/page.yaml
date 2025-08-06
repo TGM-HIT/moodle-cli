@@ -1,0 +1,7 @@
+mod: page
+course: 2
+cmid: 4
+page:
+  source: activity.md
+  attachments:
+    - super-advocado.jpg

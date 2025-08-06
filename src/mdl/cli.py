@@ -103,7 +103,24 @@ def upload(
     )]=False,
 ):
     """
-    Uploads one or more modules to Moodle.
+    Uploads one or more modules to Moodle. Each module is specified as a file.
+
+    The files may be of the following types:
+
+    - `.yaml`/`.yml`: contains module information in YAML format
+
+    - `.md`: contains module information in a YAML format prelude, enclosed in `---`
+
+
+
+    By using a prelude, the module may be self-contained. In that case, the contained module
+    information will usually contain a reference to itself, e.g. `source: module.md` inside a file
+    `module.md`.
+
+
+
+    File paths are always resolved relative to the specified file. For self-contained files, that
+    means a self-reference can always be written as a file name without a path component.
     """
 
     module_metas = []
@@ -113,8 +130,9 @@ def upload(
             case '.yaml' | '.yml':
                 meta = YAML(typ='safe').load(module_path)
             case '.md':
-                modules = YAML(typ='safe').load_all(module_path)
-                meta = next(modules)
+                meta = next(YAML(typ='safe').load_all(module_path))
+            case _:
+                exit(f"unknown module type: {module_path} (supported: .yaml/.yml, .md)")
 
         meta = ModuleMeta(**meta)
 
@@ -130,6 +148,12 @@ def upload(
     if dry_run:
         print("performing a dry-run, exiting...")
         return
+
+    for (module_path, module) in zip(modules, module_metas):
+        root = module_path.parent
+        result = moodle.upload_module(root, module)
+        if result != 'ok':
+            exit(f"unexpected response while processing {module_path}: {result}")
 
 
 @app.command()
