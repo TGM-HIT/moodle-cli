@@ -1,3 +1,4 @@
+from enum import Enum
 import json
 
 from bs4 import BeautifulSoup
@@ -6,12 +7,18 @@ import requests
 import typst
 
 
+class CoursesFilter(str, Enum):
+    enrolled = "enrolled"
+    editable = "editable"
+
+
 class Mdl(Moodle):
-    def get_courses(self, editable=True):
-        if editable:
-            return self.core.course.search_courses("search", "", requiredcapabilities=['moodle/course:manageactivities'])
-        else:
-            return self.core.course.search_courses("search", "", limittoenrolled=1)
+    def get_courses(self, filter=CoursesFilter.editable):
+        match filter:
+            case CoursesFilter.enrolled:
+                return self.core.course.search_courses("search", "", limittoenrolled=1)
+            case CoursesFilter.editable:
+                return self.core.course.search_courses("search", "", requiredcapabilities=['moodle/course:manageactivities'])
 
     def get_course_contents(self, courseid):
         return self.core.course.get_contents(courseid)

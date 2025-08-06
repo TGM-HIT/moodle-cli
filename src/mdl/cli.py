@@ -2,39 +2,63 @@ from typing_extensions import Annotated
 
 import typer
 
-from . import Mdl
+from . import Mdl, CoursesFilter
 
 
-app = typer.Typer(no_args_is_help=True)
+app = typer.Typer(rich_markup_mode='markdown', no_args_is_help=True)
 
 
 @app.callback()
 def main(
-    base_url: Annotated[str, typer.Option(envvar="MOODLE_BASE_URL")],
-    token: Annotated[str, typer.Option(envvar="MOODLE_TOKEN")],
+    base_url: Annotated[str, typer.Option(
+        envvar="MOODLE_BASE_URL",
+        help="the URL of your Moodle installation not including `/webservice/rest/server.php`",
+        rich_help_panel="Connection",
+        show_default=False,
+    )],
+    token: Annotated[str, typer.Option(
+        envvar="MOODLE_TOKEN",
+        help="the webservice token used to access Moodle, a 32 digit hex string",
+        rich_help_panel="Connection",
+        show_default=False,
+    )],
 ):
     """
-    Manage Moodle courses and activities
+    Manage Moodle courses and activities.
     """
     global moodle
     moodle = Mdl(f'{base_url}/webservice/rest/server.php', token)
 
 
 @app.command()
-def courses(editable: bool=True):
+def courses(
+    filter: Annotated[CoursesFilter, typer.Option(
+        help="""
+        what subset of the user's courses to show
+
+        - `enrolled` selects all the user's courses
+        - `editable` selects the user's courses for which they have editing privileges
+          (`moodle/course:manageactivities`)
+        """,
+    )]=CoursesFilter.editable,
+):
     """
-    Lists the user's Moodle courses; if editable is set, only courses the user has editing
-    privileges for (`moodle/course:manageactivities`) are considered.
+    Lists the user's Moodle courses.
     """
-    courses = moodle.get_courses().courses
+    courses = moodle.get_courses(filter).courses
     for course in courses:
         print(f"- {course.displayname} (ID={course.id})")
 
 
 @app.command()
-def contents(courseid: int):
+def contents(
+    courseid: Annotated[int, typer.Argument(
+        help="the ID of the course whose contents to display",
+        show_default=False,
+    )],
+):
     """
-    Lists the course's sections and modules.
+    Lists a course's sections and modules.
     """
     sections = moodle.get_course_contents(2)
     for section in sections:
@@ -44,9 +68,14 @@ def contents(courseid: int):
 
 
 @app.command()
-def module(cmid: int):
+def module(
+    cmid: Annotated[int, typer.Argument(
+        help="the ID of the module (\"course module ID\") to display",
+        show_default=False,
+    )],
+):
     """
-    Shows the module.
+    Shows a module.
     """
     cm = moodle.get_course_module(cmid).cm
     print(f"{cm.name} (mod_{cm.modname}, ID={cm.id}, in course {cm.course}){" (hidden)" if not cm.visible else ""}")
