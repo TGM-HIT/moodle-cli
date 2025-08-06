@@ -6,6 +6,7 @@ import sys
 import typer
 
 from . import Mdl, CoursesFilter
+from .course import ModuleMeta
 
 
 app = typer.Typer(rich_markup_mode='markdown', no_args_is_help=True)
@@ -115,12 +116,14 @@ def upload(
                 modules = YAML(typ='safe').load_all(module_path)
                 meta = next(modules)
 
+        meta = ModuleMeta(**meta)
+
         if verify:
-            cm = moodle.get_course_module(meta['cmid']).cm
-            if cm.modname != meta['mod']:
-                exit(f"modules is supposed to be of type mod_{meta['mod']}, but is mod_{cm.modname}")
-            if 'course' in meta and cm.course != meta['course']:
-                exit(f"modules is supposed to be in course {meta['course']}, but is in {cm.course}")
+            cm = moodle.get_course_module(meta.cmid).cm
+            if cm.modname != meta.mod:
+                exit(f"modules is supposed to be of type mod_{meta.mod}, but is mod_{cm.modname}")
+            if meta.course is not None and cm.course != meta.course:
+                exit(f"modules is supposed to be in course {meta.course}, but is in {cm.course}")
 
         module_metas.append(meta)
 
