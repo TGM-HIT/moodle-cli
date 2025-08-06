@@ -1,5 +1,8 @@
+from pathlib import Path
 from typing_extensions import Annotated
 
+from ruamel.yaml import YAML
+import sys
 import typer
 
 from . import Mdl, CoursesFilter
@@ -7,6 +10,10 @@ from . import Mdl, CoursesFilter
 
 app = typer.Typer(rich_markup_mode='markdown', no_args_is_help=True)
 
+
+def exit(*msg, code=1):
+    print(file=sys.stderr, *msg)
+    raise typer.Exit(code=code)
 
 @app.callback()
 def main(
@@ -82,9 +89,48 @@ def module(
 
 
 @app.command()
-def test():
-    from pathlib import Path
+def upload(
+    modules: Annotated[list[Path], typer.Argument(
+        help="the manifests specifying the modules to upload",
+        show_default=False,
+    )],
+    verify: Annotated[bool, typer.Option(
+        help="whether to verify the module type and course before uploading a module",
+    )]=True,
+    dry_run: Annotated[bool, typer.Option(
+        help="whether to not actually upload anything",
+    )]=False,
+):
+    """
+    Uploads one or more modules to Moodle.
+    """
 
+    module_metas = []
+    for module_path in modules:
+        ext = module_path.suffix
+        match ext:
+            case '.yaml' | '.yml':
+                meta = YAML(typ='safe').load(module_path)
+            case '.md':
+                modules = YAML(typ='safe').load_all(module_path)
+                meta = next(modules)
+
+        if verify:
+            cm = moodle.get_course_module(meta['cmid']).cm
+            if cm.modname != meta['mod']:
+                exit(f"modules is supposed to be of type mod_{meta['mod']}, but is mod_{cm.modname}")
+            if 'course' in meta and cm.course != meta['course']:
+                exit(f"modules is supposed to be in course {meta['course']}, but is in {cm.course}")
+
+        module_metas.append(meta)
+
+    if dry_run:
+        print("performing a dry-run, exiting...")
+        return
+
+
+@app.command()
+def test():
     from . import process
 
     filename = Path('content/activity.typ')

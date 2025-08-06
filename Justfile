@@ -9,5 +9,8 @@ show-course:
 	uv run mdl contents 2
 	uv run mdl module 2
 
+upload *ARGS:
+	@uv run mdl upload {{ARGS}}
+
 test:
 	@uv run mdl test
