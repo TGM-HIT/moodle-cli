@@ -129,7 +129,6 @@ source = { editable = "." }
 dependencies = [
     { name = "beautifulsoup4" },
     { name = "moodlepy" },
-    { name = "requests" },
     { name = "ruamel-yaml" },
     { name = "typer" },
     { name = "typst" },
@@ -139,7 +138,6 @@ dependencies = [
 requires-dist = [
     { name = "beautifulsoup4", specifier = ">=4.13.4" },
     { name = "moodlepy", git = "https://github.com/SillyFreak/moodlepy?branch=improvements" },
-    { name = "requests", specifier = ">=2.32.3" },
     { name = "ruamel-yaml", specifier = ">=0.18.14" },
     { name = "typer", specifier = ">=0.16.0" },
     { name = "typst", specifier = ">=0.13.3" },
