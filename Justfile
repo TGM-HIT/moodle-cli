@@ -11,6 +11,3 @@ show-course:
 
 upload *ARGS:
 	@uv run mdl upload {{ARGS}}
-
-test:
-	@uv run mdl test
