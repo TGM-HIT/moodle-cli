@@ -1,10 +1,5 @@
 from enum import Enum
-import json
 from pathlib import Path
-
-from bs4 import BeautifulSoup
-import requests
-import typst
 
 from .course import ModuleMeta
 from .moodle import Moodle
@@ -48,31 +43,45 @@ class Mdl(Moodle):
             if editor == None:
                 return None
 
-            with open(root/editor.source, 'rt') as f:
-                text = f.read()
-            if editor.source.suffix == '.md' and text.startswith('---'):
-                # this markdown file has a prelude; skip it
-                import re
+            source = root/editor.source
+            attachments = editor.attachments
+            suffix = editor.source.suffix
 
-                matches = re.finditer(r'^---( [|>][+-]?\d*)?\n', text, re.MULTILINE)
-                next(matches)  # the initial document separator
-                try:
-                    match = next(matches)
-                except StopIteration:
-                    # no second match: assume that this was not a prelude
-                    pass
-                else:
-                    # remove the prelude
-                    text = text[match.end():]
+            if suffix == '.typ':
+                # compile Typst document to HTML
+                text = typst.body(source)
 
-            match editor.source.suffix:
+                # extract attachments from Typst metadata
+                attachments += [Path(att) for att in typst.attachments(source)]
+
+            else:
+                # read text file
+                with open(source, 'rt') as f:
+                    text = f.read()
+
+                if suffix == '.md' and text.startswith('---'):
+                    # this markdown file has a prelude; skip it
+                    import re
+
+                    matches = re.finditer(r'^---( [|>][+-]?\d*)?\n', text, re.MULTILINE)
+                    next(matches)  # the initial document separator
+                    try:
+                        match = next(matches)
+                    except StopIteration:
+                        # no second match: assume that this was not a prelude
+                        pass
+                    else:
+                        # remove the prelude
+                        text = text[match.end():]
+
+            match suffix:
                 case '.txt':
                     format = 2
                 case '.md':
                     format = 4
-                case '.html' | '.htm' | _:
+                case '.html' | '.htm' | '.typ' | _:
                     format = 1
-            itemid = upload_files(editor.attachments)
+            itemid = upload_files(attachments)
 
             result = dict(text=text, format=format)
             if itemid is not None:
@@ -119,11 +128,3 @@ class Mdl(Moodle):
                 )
 
         return result
-
-
-def process(filename: str):
-    metadata = json.loads(typst.query(filename, '<frontmatter>', field="value", one=True))
-    html = typst.compile(filename, format='html')
-    body = BeautifulSoup(html, 'html.parser').body.decode_contents()
-
-    return metadata, body

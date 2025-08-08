@@ -5,7 +5,7 @@ from ruamel.yaml import YAML
 import sys
 import typer
 
-from . import Mdl, CoursesFilter
+from . import typst, Mdl, CoursesFilter
 from .course import ModuleMeta
 
 
@@ -131,8 +131,10 @@ def upload(
                 meta = YAML(typ='safe').load(module_path)
             case '.md':
                 meta = next(YAML(typ='safe').load_all(module_path))
+            case '.typ':
+                meta = typst.frontmatter(module_path)
             case _:
-                exit(f"unknown module type: {module_path} (supported: .yaml/.yml, .md)")
+                exit(f"unknown module type: {module_path} (supported: .yaml/.yml, .md, .typ)")
 
         meta = ModuleMeta(**meta)
 
@@ -158,28 +160,30 @@ def upload(
 
 @app.command()
 def test():
-    from . import process
+    filename = Path('content-typ/activity.typ')
+    print(typst.body(filename))
+    print(typst.frontmatter(filename))
+    print(typst.attachments(filename))
 
-    filename = Path('content/activity.typ')
-    metadata, body = process(filename)
-    if metadata['mod'] != 'assign':
-        raise ValueError(f"Unsupported module type: {metadata['mod']}")
+    # metadata, body = process(filename)
+    # if metadata['mod'] != 'assign':
+    #     raise ValueError(f"Unsupported module type: {metadata['mod']}")
 
-    if len(metadata['attachments']) != 0:
-        result = moodle.upload(*(
-            (attachment, open(filename.parent/attachment, 'rb'))
-            for attachment in set(metadata['attachments'])
-        ))
-        itemid = result[0].itemid
-    else:
-        itemid = None
+    # if len(metadata['attachments']) != 0:
+    #     result = moodle.upload(*(
+    #         (attachment, open(filename.parent/attachment, 'rb'))
+    #         for attachment in set(metadata['attachments'])
+    #     ))
+    #     itemid = result[0].itemid
+    # else:
+    #     itemid = None
 
-    result = moodle.modcontentservice.update_assign_content(
-        cmid=metadata['cmid'],
-        intro=dict(text=body),
-        attachments=itemid,
-    )
-    print(result)
+    # result = moodle.modcontentservice.update_assign_content(
+    #     cmid=metadata['cmid'],
+    #     intro=dict(text=body),
+    #     attachments=itemid,
+    # )
+    # print(result)
 
     # result = moodle.upload(
     #     ('super-advocado.jpg', open('/home/clemens/Pictures/super-advocado.jpg', 'rb')),
