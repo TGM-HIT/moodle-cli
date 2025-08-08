@@ -1,7 +1,7 @@
 [project]
 name = "mdl"
 version = "0.1.0"
-description = "Add your description here"
+description = "A command line tool for updating Moodle activities"
 readme = "README.md"
 authors = [
     { name = "Clemens Koza", email = "ckoza@tgm.ac.at" }
