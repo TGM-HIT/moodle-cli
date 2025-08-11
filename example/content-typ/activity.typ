@@ -1,4 +1,4 @@
-#import "moodle.typ"
+#import "moodle.typ" as moodle: moodular, c4l
 
 #show: moodle.setup(
   mod: "assign",
@@ -6,13 +6,13 @@
   cmid: 2,
   intro: (source: "activity.typ"),
 )
+#show: c4l.blockquotes-as-c4l()
 
 #quote(block: true)[
   asdf
 ]
 
-#moodle.attachment("super-advocado.jpg")
-#html.elem("img", attrs: (src: "@@PLUGINFILE@@/super-advocado.jpg", alt: "Advocado"))
+#image("super-advocado.jpg", alt: "Advocado")
 
 ```java
 public static void main(String[] args) {
