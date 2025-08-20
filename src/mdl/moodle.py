@@ -3,6 +3,35 @@ from moodle.utils.decorator import lazy
 
 
 class ModContentService(BaseMoodle):
+    def update_assign_content(self, *, cmid: int, intro: dict=None, activity: dict=None, attachments: int=None):
+        if intro is None:
+            intro = dict(text='')
+        if activity is None:
+            activity = dict(text='')
+        if attachments is None:
+            attachments = 0
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_assign_content",
+            cmid=cmid,
+            intro=intro,
+            activity=activity,
+            attachments=attachments,
+        )
+        return data
+
+    def update_folder_content(self, *, cmid: int, intro: dict=None, files: int):
+        if intro is None:
+            intro = dict(text='')
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_folder_content",
+            cmid=cmid,
+            intro=intro,
+            files=files,
+        )
+        return data
+
     def update_page_content(self, *, cmid: int, intro: dict=None, page: dict):
         if intro is None:
             intro = dict(text='')
@@ -24,35 +53,6 @@ class ModContentService(BaseMoodle):
             cmid=cmid,
             intro=intro,
             files=files,
-        )
-        return data
-
-    def update_folder_content(self, *, cmid: int, intro: dict=None, files: int):
-        if intro is None:
-            intro = dict(text='')
-
-        data = self.moodle.post(
-            "local_modcontentservice_update_folder_content",
-            cmid=cmid,
-            intro=intro,
-            files=files,
-        )
-        return data
-
-    def update_assign_content(self, *, cmid: int, intro: dict=None, activity: dict=None, attachments: int=None):
-        if intro is None:
-            intro = dict(text='')
-        if activity is None:
-            activity = dict(text='')
-        if attachments is None:
-            attachments = 0
-
-        data = self.moodle.post(
-            "local_modcontentservice_update_assign_content",
-            cmid=cmid,
-            intro=intro,
-            activity=activity,
-            attachments=attachments,
         )
         return data
 
