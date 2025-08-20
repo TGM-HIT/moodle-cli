@@ -111,6 +111,9 @@ def upload(
 
     - `.md`: contains module information in a YAML format prelude, enclosed in `---`
 
+    - `.typ`: contains module information in metadata labelled `<frontmatter>`;
+      if used for rich text, attachments can be added through metadata labelled `<attachments>`
+
 
 
     By using a prelude, the module may be self-contained. In that case, the contained module
