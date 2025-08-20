@@ -110,6 +110,11 @@ class Mdl(Moodle):
                     intro=intro,
                     files=files,
                 )
+            case 'label':
+                result = self.modcontentservice.update_label_content(
+                    cmid=module.cmid,
+                    intro=intro,
+                )
             case 'page':
                 page = prepare_editor(module.page)
 

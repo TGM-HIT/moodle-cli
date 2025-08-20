@@ -32,6 +32,17 @@ class ModContentService(BaseMoodle):
         )
         return data
 
+    def update_label_content(self, *, cmid: int, intro: dict=None):
+        if intro is None:
+            intro = dict(text='')
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_label_content",
+            cmid=cmid,
+            intro=intro,
+        )
+        return data
+
     def update_page_content(self, *, cmid: int, intro: dict=None, page: dict):
         if intro is None:
             intro = dict(text='')

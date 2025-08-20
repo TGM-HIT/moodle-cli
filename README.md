@@ -11,6 +11,7 @@ This Python CLI application allows managing Moodle modules through the [Module C
 - updating modules
   - replace an assignment's description, activity instructions, and additional files
   - replace a folder's description and files
+  - replace a label's text
   - replace a page's description and page content
   - replace a resource's description and file
 
@@ -110,7 +111,6 @@ For Typst files, the module is specified in a metadata element labelled with `<f
 Beyond these, the following module-specific fields are supported:
 
 - Assignments:
-
   ```yaml
   mod: assign
   ...
@@ -122,8 +122,8 @@ Beyond these, the following module-specific fields are supported:
     - <file name>
     - ...
   ```
-- Folders
 
+- Folders:
   ```yaml
   mod: folder
   ...
@@ -132,8 +132,10 @@ Beyond these, the following module-specific fields are supported:
     - <file name>
     - ...
   ```
-- Pages:
 
+- Labels: no additional fields
+
+- Pages:
   ```yaml
   mod: page
   ...
@@ -141,8 +143,8 @@ Beyond these, the following module-specific fields are supported:
   page:
     ...
   ```
-- Resources:
 
+- Resources:
   ```yaml
   mod: resource
   ...
