@@ -14,6 +14,7 @@ This Python CLI application allows managing Moodle modules through the [Module C
   - replace a label's text
   - replace a page's description and page content
   - replace a resource's description and file
+  - replace a course section's summary (sections are not modules but directly part of a course, but they are supported as well)
 
   these are achieved through [Module Content Service API endpoints](https://github.com/TGM-HIT/moodle-local_modcontentservice?tab=readme-ov-file#endpoint-functions)
 
@@ -158,6 +159,17 @@ Beyond these, the following module-specific fields are supported:
   ...
   # file name of the resource file
   file: <file name>
+  ```
+
+- Sections:
+
+  Sections don't have a `cmid` or `intro` field; the optional `course` field is used for validation as described above. In addition there are the following fields
+  ```yaml
+  mod: $section  # not a real module name
+  ...
+  # optional; section summary in the same format as `intro`
+  summary:
+    ...
   ```
 
 
