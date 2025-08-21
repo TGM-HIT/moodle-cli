@@ -1,12 +1,10 @@
 from pathlib import Path
 from typing_extensions import Annotated
 
-from ruamel.yaml import YAML
 import sys
 import typer
 
-from . import typst, Mdl, CoursesFilter
-from .course import ModuleMeta
+from . import course, Mdl, CoursesFilter
 
 
 app = typer.Typer(rich_markup_mode='markdown', no_args_is_help=True)
@@ -140,29 +138,10 @@ def upload(
     if verify or not dry_run:
         require_moodle()
 
-    module_metas = []
-    for module_path in modules:
-        ext = module_path.suffix
-        match ext:
-            case '.yaml' | '.yml':
-                meta = YAML(typ='safe').load(module_path)
-            case '.md':
-                meta = next(YAML(typ='safe').load_all(module_path))
-            case '.typ':
-                meta = typst.frontmatter(module_path)
-            case _:
-                exit(f"unknown module type: {module_path} (supported: .yaml/.yml, .md, .typ)")
-
-        meta = ModuleMeta(**meta)
-
-        if verify:
-            cm = moodle.get_course_module(meta.cmid).cm
-            if cm.modname != meta.mod:
-                exit(f"modules is supposed to be of type mod_{meta.mod}, but is mod_{cm.modname}")
-            if meta.course is not None and cm.course != meta.course:
-                exit(f"modules is supposed to be in course {meta.course}, but is in {cm.course}")
-
-        module_metas.append(meta)
+    try:
+        module_metas = course.collect_metas(modules, verify_with=moodle if verify else None)
+    except course.CourseException as ex:
+        exit(*ex.args)
 
     if dry_run:
         print("performing a dry-run, exiting...")

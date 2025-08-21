@@ -2,6 +2,14 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from ruamel.yaml import YAML
+
+from . import typst
+
+
+class CourseException(Exception):
+    pass
+
 
 def _coerce_path(obj):
     assert isinstance(obj, (Path, str, type(None)))
@@ -89,3 +97,31 @@ class ResourceMeta(ModuleMeta):
     def __post_init__(self):
         super().__post_init__()
         self.file = _coerce_path(self.file)
+
+
+def collect_metas(modules: list[Path], verify_with=None) -> list[ModuleMeta]:
+    module_metas = []
+    for module_path in modules:
+        ext = module_path.suffix
+        match ext:
+            case '.yaml' | '.yml':
+                meta = YAML(typ='safe').load(module_path)
+            case '.md':
+                meta = next(YAML(typ='safe').load_all(module_path))
+            case '.typ':
+                meta = typst.frontmatter(module_path)
+            case _:
+                raise CourseException(f"unknown module type: {module_path} (supported: .yaml/.yml, .md, .typ)")
+
+        meta = ModuleMeta(**meta)
+
+        if verify_with is not None:
+            moodle = verify_with
+            cm = moodle.get_course_module(meta.cmid).cm
+            if cm.modname != meta.mod:
+                raise CourseException(f"modules is supposed to be of type mod_{meta.mod}, but is mod_{cm.modname}")
+            if meta.course is not None and cm.course != meta.course:
+                raise CourseException(f"modules is supposed to be in course {meta.course}, but is in {cm.course}")
+
+        module_metas.append(meta)
+    return module_metas
