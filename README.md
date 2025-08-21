@@ -101,7 +101,16 @@ intro:
     - ...
 ```
 
-For Typst files, the module is specified in a metadata element labelled with `<frontmatter>`:
+An input file may also specify `children` to be treated as additional input files. This can be done in addition to defining a module configuration, or instead. For example instead of passing many many files to the `mdl upload` command, you can instead pass a single `list.yaml` file if you prefer.
+
+```yaml
+# optional; list of files to be treated as additional input files
+children:
+- <file name>
+- ...
+```
+
+For Typst files, the module (and children) are specified in a metadata element labelled with `<frontmatter>`:
 
 ```typ
 #metadata((mod: <module name>, ...))<frontmatter>
@@ -168,3 +177,5 @@ The data structure described above can be contained in different kinds of input 
 - `.yaml` or `.yml`: the whole file is parsed as YAML. This is the preferred format for cases where e.g. `intro` _and_ `activity` are specified – or neither, e.g. in the case of a `folder` without description.
 - `.md`: the file must start with a YAML front matter block, which is used for the module data. The front matter will usually refer to the file itself as some `source`.
 - `.typ`: the file must contain a `<frontmatter>` metadata element. The front matter will usually refer to the file itself as some `source`. When doing so, you can of course use `<attachments>` instead of adding the attachments to the module data.
+
+Input files can also have a `children` key containing a list of file names; these are recursively added to the input files.
