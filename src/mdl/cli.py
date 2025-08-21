@@ -150,11 +150,11 @@ def upload(
             changes = set(Path(line.rstrip('\r\n')) for line in f)
 
     try:
-        module_metas = course.collect_metas(modules, verify_with=moodle if verify else None)
+        modules = course.collect_metas(modules, verify_with=moodle if verify else None)
     except course.CourseException as ex:
         exit(*ex.args)
 
-    for (module_path, module) in zip(modules, module_metas):
+    for (module_path, module) in modules:
         root = module_path.parent
         if changes is not None:
             dependencies = module.dependencies(root)
@@ -196,12 +196,12 @@ def dependencies(
     """
 
     try:
-        module_metas = course.collect_metas(modules)
+        modules = course.collect_metas(modules)
     except course.CourseException as ex:
         exit(*ex.args)
 
     dependencies = set()
-    for (module_path, module) in zip(modules, module_metas):
+    for (module_path, module) in modules:
         root = module_path.parent
         dependencies.update(module.dependencies(root))
 

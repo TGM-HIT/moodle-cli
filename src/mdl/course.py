@@ -142,20 +142,20 @@ class ResourceMeta(ModuleMeta):
         return dependencies
 
 
-def collect_metas(modules: list[Path], verify_with=None) -> list[ModuleMeta]:
-    module_metas = []
-    for module_path in modules:
-        ext = module_path.suffix
+def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, ModuleMeta]]:
+    def read_input(input_path: Path):
+        ext = input_path.suffix
         match ext:
             case '.yaml' | '.yml':
-                meta = YAML(typ='safe').load(module_path)
+                return YAML(typ='safe').load(input_path)
             case '.md':
-                meta = next(YAML(typ='safe').load_all(module_path))
+                return next(YAML(typ='safe').load_all(input_path))
             case '.typ':
-                meta = typst.frontmatter(module_path)
+                return typst.frontmatter(input_path)
             case _:
-                raise CourseException(f"unknown module type: {module_path} (supported: .yaml/.yml, .md, .typ)")
+                raise CourseException(f"unknown input type: {input_path} (supported: .yaml/.yml, .md, .typ)")
 
+    def prepare_meta(meta) -> ModuleMeta:
         meta = ModuleMeta(**meta)
 
         if verify_with is not None:
@@ -166,5 +166,13 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[ModuleMeta]:
             if meta.course is not None and cm.course != meta.course:
                 raise CourseException(f"modules is supposed to be in course {meta.course}, but is in {cm.course}")
 
-        module_metas.append(meta)
+        return meta
+
+    module_metas = []
+    for input_path in modules:
+        meta = read_input(input_path)
+
+        meta = prepare_meta(meta)
+
+        module_metas.append((input_path, meta))
     return module_metas
