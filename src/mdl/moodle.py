@@ -3,6 +3,17 @@ from moodle.utils.decorator import lazy
 
 
 class ModContentService(BaseMoodle):
+    def update_section_content(self, *, section: int, summary: dict=None):
+        if summary is None:
+            summary = dict(text='')
+
+        data = self.moodle.post(
+            "local_modcontentservice_update_section_content",
+            section=section,
+            summary=summary,
+        )
+        return data
+
     def update_assign_content(self, *, cmid: int, intro: dict=None, activity: dict=None, attachments: int=None):
         if intro is None:
             intro = dict(text='')

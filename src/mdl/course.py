@@ -2,6 +2,7 @@ from dataclasses import dataclass, field
 from pathlib import Path
 from typing import Optional
 
+from moodle.core.course import ContentOption
 from ruamel.yaml import YAML
 
 from . import typst
@@ -43,6 +44,19 @@ class EditorContent:
             dependencies.update(root/att for att in typst.attachments(root/self.source))
             dependencies.update(root/dep for dep in typst.dependencies(root/self.source))
         return dependencies
+
+
+@dataclass(kw_only=True)
+class SectionMeta:
+    course: Optional[int] = None
+    section: int
+    summary: Optional[EditorContent] = None
+
+    def __post_init__(self):
+        self.summary = _coerce_editor_content(self.summary)
+
+    def dependencies(self, root: Path) -> set[Path]:
+        return self.summary.dependencies(root) if self.summary is not None else set()
 
 
 @dataclass(kw_only=True)
@@ -142,7 +156,7 @@ class ResourceMeta(ModuleMeta):
         return dependencies
 
 
-def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, ModuleMeta]]:
+def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, ModuleMeta | SectionMeta]]:
     def read_input(input_path: Path):
         ext = input_path.suffix
         match ext:
@@ -155,7 +169,7 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
             case _:
                 raise CourseException(f"unknown input type: {input_path} (supported: .yaml/.yml, .md, .typ)")
 
-    def prepare_meta(meta) -> ModuleMeta:
+    def prepare_module_meta(meta) -> ModuleMeta:
         meta = ModuleMeta(**meta)
 
         if verify_with is not None:
@@ -168,6 +182,18 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
 
         return meta
 
+    def prepare_section_meta(meta) -> SectionMeta:
+        meta.pop('mod')
+        meta = SectionMeta(**meta)
+
+        if verify_with is not None:
+            moodle = verify_with
+            sections = moodle.core.course.get_contents(meta.course, [ContentOption('excludemodules', True)])
+            if not any(section.id == meta.section for section in sections):
+                raise CourseException(f"section is supposed to be in course {meta.course}")
+
+        return meta
+
     module_metas = []
     def collect(inputs):
         for input_path in inputs:
@@ -176,7 +202,13 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
             children = meta.pop('children', None)
 
             if 'mod' in meta:
-                meta = prepare_meta(meta)
+                if not meta['mod'].startswith('$'):
+                    meta = prepare_module_meta(meta)
+                elif meta['mod'] == '$section':
+                    meta = prepare_section_meta(meta)
+                else:
+                    raise ValueError(f"{input_path}: unknown special module type '{meta['mod']}'")
+
                 module_metas.append((input_path, meta))
             elif meta != {}:
                 raise ValueError(f"unexpected extra content in {input_path}: {meta}")

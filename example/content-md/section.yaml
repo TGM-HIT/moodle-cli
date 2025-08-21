@@ -1,0 +1,7 @@
+mod: $section
+course: 2
+section: 1
+summary:
+  source: activity.md
+  attachments:
+    - super-advocado.jpg

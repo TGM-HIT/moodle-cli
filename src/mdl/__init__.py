@@ -1,7 +1,7 @@
 from enum import Enum
 from pathlib import Path
 
-from .course import ModuleMeta
+from .course import ModuleMeta, SectionMeta
 from .moodle import Moodle
 
 
@@ -27,7 +27,7 @@ class Mdl(Moodle):
             raise ValueError("cmid does not belong to the given course")
         return module
 
-    def upload_module(self, root: Path, module: ModuleMeta):
+    def upload_module(self, root: Path, module: ModuleMeta | SectionMeta):
         def upload_files(files):
             if len(files) == 0:
                 return None
@@ -89,47 +89,57 @@ class Mdl(Moodle):
             return result
 
 
-        intro = prepare_editor(module.intro)
+        if isinstance(module, ModuleMeta):
+            intro = prepare_editor(module.intro)
 
-        match module.mod:
-            case 'assign':
-                activity = prepare_editor(module.activity)
-                attachments = upload_files(module.attachments)
+            match module.mod:
+                case 'assign':
+                    activity = prepare_editor(module.activity)
+                    attachments = upload_files(module.attachments)
 
-                result = self.modcontentservice.update_assign_content(
-                    cmid=module.cmid,
-                    intro=intro,
-                    activity=activity,
-                    attachments=attachments,
-                )
-            case 'folder':
-                files = upload_files(module.files)
+                    result = self.modcontentservice.update_assign_content(
+                        cmid=module.cmid,
+                        intro=intro,
+                        activity=activity,
+                        attachments=attachments,
+                    )
+                case 'folder':
+                    files = upload_files(module.files)
 
-                result = self.modcontentservice.update_folder_content(
-                    cmid=module.cmid,
-                    intro=intro,
-                    files=files,
-                )
-            case 'label':
-                result = self.modcontentservice.update_label_content(
-                    cmid=module.cmid,
-                    intro=intro,
-                )
-            case 'page':
-                page = prepare_editor(module.page)
+                    result = self.modcontentservice.update_folder_content(
+                        cmid=module.cmid,
+                        intro=intro,
+                        files=files,
+                    )
+                case 'label':
+                    result = self.modcontentservice.update_label_content(
+                        cmid=module.cmid,
+                        intro=intro,
+                    )
+                case 'page':
+                    page = prepare_editor(module.page)
 
-                result = self.modcontentservice.update_page_content(
-                    cmid=module.cmid,
-                    intro=intro,
-                    page=page,
-                )
-            case 'resource':
-                files = upload_files([module.file])
+                    result = self.modcontentservice.update_page_content(
+                        cmid=module.cmid,
+                        intro=intro,
+                        page=page,
+                    )
+                case 'resource':
+                    files = upload_files([module.file])
 
-                result = self.modcontentservice.update_resource_content(
-                    cmid=module.cmid,
-                    intro=intro,
-                    files=files,
-                )
+                    result = self.modcontentservice.update_resource_content(
+                        cmid=module.cmid,
+                        intro=intro,
+                        files=files,
+                    )
+        elif isinstance(module, SectionMeta):
+            summary = prepare_editor(module.summary)
+
+            result = self.modcontentservice.update_section_content(
+                section=module.section,
+                summary=summary,
+            )
+        else:
+            raise ValueError(f"{module} was not a valid module/section configuration")
 
         return result
