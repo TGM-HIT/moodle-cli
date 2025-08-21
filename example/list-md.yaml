@@ -1,0 +1,6 @@
+children:
+- content-md/assign.yaml
+- content-md/folder.yaml
+- content-md/label.yaml
+- content-md/page.yaml
+- content-md/resource.yaml

@@ -169,10 +169,23 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
         return meta
 
     module_metas = []
-    for input_path in modules:
-        meta = read_input(input_path)
+    def collect(inputs):
+        for input_path in inputs:
+            meta = read_input(input_path)
 
-        meta = prepare_meta(meta)
+            children = meta.pop('children', None)
 
-        module_metas.append((input_path, meta))
+            if 'mod' in meta:
+                meta = prepare_meta(meta)
+                module_metas.append((input_path, meta))
+            elif meta != {}:
+                raise ValueError(f"unexpected extra content in {input_path}: {meta}")
+            elif children is None:
+                raise ValueError(f"{input_path} contained neither a module nor children")
+
+            if children is not None:
+                root = input_path.parent
+                collect(root/f for f in children)
+    collect(modules)
+
     return module_metas
