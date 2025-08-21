@@ -1,0 +1,2 @@
+content-md/activity.md
+content-typ/code.typ
