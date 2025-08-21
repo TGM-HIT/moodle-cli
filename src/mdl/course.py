@@ -49,10 +49,14 @@ class ModuleMeta:
                 cls = AssignMeta
             case 'folder':
                 cls = FolderMeta
+            case 'label':
+                cls = LabelMeta
             case 'page':
                 cls = PageMeta
             case 'resource':
                 cls = ResourceMeta
+            case _:
+                raise AssertionError("Unknown ModuleMeta class")
         return super().__new__(cls)
 
     def __post_init__(self):
@@ -80,6 +84,10 @@ class FolderMeta(ModuleMeta):
         for i in range(len(self.files)):
             self.files[i] = _coerce_path(self.files[i])
 
+
+@dataclass(kw_only=True)
+class LabelMeta(ModuleMeta):
+    pass
 
 @dataclass(kw_only=True)
 class PageMeta(ModuleMeta):
