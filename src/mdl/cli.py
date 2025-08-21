@@ -155,7 +155,7 @@ def upload(
 
 
 @app.command()
-def list(
+def dependencies(
     modules: Annotated[list[Path], typer.Argument(
         help="the manifests specifying the modules to scan",
         show_default=False,
@@ -165,16 +165,16 @@ def list(
     )]=False,
 ):
     """
-    Lists files that contribute content to the specified modules. The files are the same types as
-    accepted by the `upload` command. The list of contributing files is constructed by taking all
+    Lists files that contribute content to the specified modules. The input files are the same types
+    as accepted by the `upload` command. The list of dependencies is constructed by taking all
     `source`s and `attachments`.
 
     A `.md` or `.typ` input file that does not specify itself as a source in its frontmatter is not
-    considered to contribute content.
+    considered a dependency.
 
     Note that this does _not_ automatically consider imports and includes inside `.typ` files. Typst
     files can add `<dependencies>` metadata to augment the list of files, but must do so manually
-    and need to take care about relative paths.
+    and need to take care of relative paths.
     """
 
     try:
