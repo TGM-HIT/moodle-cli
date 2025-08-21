@@ -108,6 +108,13 @@ def upload(
     verify: Annotated[bool, typer.Option(
         help="whether to verify the module type and course before uploading a module",
     )]=True,
+    changes: Annotated[Path, typer.Option(
+        help="""
+        A file containing line-by-line filenames to consider changed. If this is provided, only
+        modules that depend (see `dependencies` command) on any of the listed files are uploaded,
+        others are skipped.
+        """,
+    )]=None,
     dry_run: Annotated[bool, typer.Option(
         help="whether to not actually upload anything",
     )]=False,
@@ -138,17 +145,28 @@ def upload(
     if verify or not dry_run:
         require_moodle()
 
+    if changes is not None:
+        with open(changes, 'rt') as f:
+            changes = set(Path(line.rstrip('\r\n')) for line in f)
+
     try:
         module_metas = course.collect_metas(modules, verify_with=moodle if verify else None)
     except course.CourseException as ex:
         exit(*ex.args)
 
-    if dry_run:
-        print("performing a dry-run, exiting...")
-        return
-
     for (module_path, module) in zip(modules, module_metas):
         root = module_path.parent
+        if changes is not None:
+            dependencies = module.dependencies(root)
+            if dependencies.isdisjoint(changes):
+                print(f"{module_path}: skipping because no modifications were found")
+                continue
+
+        if dry_run:
+            print(f"{module_path}: performing a dry-run, upload is skipped")
+            continue
+
+        print(f"{module_path}: uploading...")
         result = moodle.upload_module(root, module)
         if result != 'ok':
             exit(f"unexpected response while processing {module_path}: {result}")
