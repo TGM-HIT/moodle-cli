@@ -1,6 +1,6 @@
 mod: label
 course: 2
-cmid: 12
+cmid: 4
 intro:
   source: activity.md
   attachments:

@@ -1,6 +1,6 @@
 mod: page
 course: 2
-cmid: 4
+cmid: 5
 page:
   source: activity.md
   attachments:
