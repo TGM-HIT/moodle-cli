@@ -11,10 +11,18 @@ from .course import ModuleMeta
 
 app = typer.Typer(rich_markup_mode='markdown', no_args_is_help=True)
 
+moodle = None
+
 
 def exit(*msg, code=1):
     print(file=sys.stderr, *msg)
     raise typer.Exit(code=code)
+
+
+def require_moodle():
+    if moodle is None:
+        exit(f"base-url and token are required for this command")
+
 
 @app.callback()
 def main(
@@ -23,19 +31,20 @@ def main(
         help="the URL of your Moodle installation not including `/webservice/rest/server.php`",
         rich_help_panel="Connection",
         show_default=False,
-    )],
+    )]=None,
     token: Annotated[str, typer.Option(
         envvar="MOODLE_TOKEN",
         help="the webservice token used to access Moodle, a 32 digit hex string",
         rich_help_panel="Connection",
         show_default=False,
-    )],
+    )]=None,
 ):
     """
     Manage Moodle courses and activities.
     """
     global moodle
-    moodle = Mdl(f'{base_url}/webservice/rest/server.php', token)
+    if base_url is not None and token is not None:
+        moodle = Mdl(f'{base_url}/webservice/rest/server.php', token)
 
 
 @app.command()
@@ -53,6 +62,7 @@ def courses(
     """
     Lists the user's Moodle courses.
     """
+    require_moodle()
     courses = moodle.get_courses(filter).courses
     for course in courses:
         print(f"- {course.displayname} (ID={course.id})")
@@ -68,6 +78,7 @@ def contents(
     """
     Lists a course's sections and modules.
     """
+    require_moodle()
     sections = moodle.get_course_contents(2)
     for section in sections:
         print(f"- {section.section}: {section.name} (ID={section.id}){" (hidden)" if not section.visible else ""}")
@@ -85,6 +96,7 @@ def module(
     """
     Shows a module.
     """
+    require_moodle()
     cm = moodle.get_course_module(cmid).cm
     print(f"{cm.name} (mod_{cm.modname}, ID={cm.id}, in course {cm.course}){" (hidden)" if not cm.visible else ""}")
 
@@ -125,6 +137,8 @@ def upload(
     File paths are always resolved relative to the specified file. For self-contained files, that
     means a self-reference can always be written as a file name without a path component.
     """
+    if verify or not dry_run:
+        require_moodle()
 
     module_metas = []
     for module_path in modules:
