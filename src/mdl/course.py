@@ -35,11 +35,10 @@ class EditorContent:
         for i in range(len(self.attachments)):
             self.attachments[i] = _coerce_path(self.attachments[i])
 
-    @property
-    def dependencies(self) -> set[Path]:
+    def dependencies(self, root: Path) -> set[Path]:
         dependencies = set()
-        dependencies.add(self.source)
-        dependencies.update(self.attachments)
+        dependencies.add(root/self.source)
+        dependencies.update(root/att for att in self.attachments)
         # TODO Typst dependencies
         return dependencies
 
@@ -70,9 +69,8 @@ class ModuleMeta:
     def __post_init__(self):
         self.intro = _coerce_editor_content(self.intro)
 
-    @property
-    def dependencies(self) -> set[Path]:
-        return self.intro.dependencies if self.intro is not None else set()
+    def dependencies(self, root: Path) -> set[Path]:
+        return self.intro.dependencies(root) if self.intro is not None else set()
 
 
 @dataclass(kw_only=True)
@@ -86,12 +84,11 @@ class AssignMeta(ModuleMeta):
         for i in range(len(self.attachments)):
             self.attachments[i] = _coerce_path(self.attachments[i])
 
-    @property
-    def dependencies(self) -> set[Path]:
-        dependencies = super().dependencies
+    def dependencies(self, root: Path) -> set[Path]:
+        dependencies = super().dependencies(root)
         if self.activity is not None:
-            dependencies.update(self.activity.dependencies)
-        dependencies.update(self.attachments)
+            dependencies.update(self.activity.dependencies(root))
+        dependencies.update(root/att for att in self.attachments)
         return dependencies
 
 
@@ -104,10 +101,9 @@ class FolderMeta(ModuleMeta):
         for i in range(len(self.files)):
             self.files[i] = _coerce_path(self.files[i])
 
-    @property
-    def dependencies(self) -> set[Path]:
-        dependencies = super().dependencies
-        dependencies.update(self.files)
+    def dependencies(self, root: Path) -> set[Path]:
+        dependencies = super().dependencies(root)
+        dependencies.update(root/f for f in self.files)
         return dependencies
 
 
@@ -123,11 +119,10 @@ class PageMeta(ModuleMeta):
         super().__post_init__()
         self.page = _coerce_editor_content(self.page)
 
-    @property
-    def dependencies(self) -> set[Path]:
-        dependencies = super().dependencies
+    def dependencies(self, root: Path) -> set[Path]:
+        dependencies = super().dependencies(root)
         if self.page is not None:
-            dependencies.update(self.page.dependencies)
+            dependencies.update(self.page.dependencies(root))
         return dependencies
 
 
@@ -139,10 +134,9 @@ class ResourceMeta(ModuleMeta):
         super().__post_init__()
         self.file = _coerce_path(self.file)
 
-    @property
-    def dependencies(self) -> set[Path]:
-        dependencies = super().dependencies
-        dependencies.add(self.file)
+    def dependencies(self, root: Path) -> set[Path]:
+        dependencies = super().dependencies(root)
+        dependencies.add(root/self.file)
         return dependencies
 
 

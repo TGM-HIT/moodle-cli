@@ -183,8 +183,9 @@ def list(
         exit(*ex.args)
 
     dependencies = set()
-    for module in module_metas:
-        dependencies.update(module.dependencies)
+    for (module_path, module) in zip(modules, module_metas):
+        root = module_path.parent
+        dependencies.update(module.dependencies(root))
 
     if sort:
         dependencies = sorted(dependencies)
