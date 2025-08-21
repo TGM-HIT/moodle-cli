@@ -68,16 +68,15 @@ The following things happen in this script:
 
 ## Installation
 
-This tool is not published on PyPI and resides in a private Github repo, so it must be installed manually. The recommended way is to clone the repository and [install it via uv](https://docs.astral.sh/uv/guides/tools/#installing-tools):
+This tool is not published on PyPI, so it must be installed manually. The recommended way is to [install it via uv](https://docs.astral.sh/uv/guides/tools/#installing-tools):
 
 ```bash
-git clone https://github.com/TGM-HIT/moodle-cli
-uv tool install ./moodle-cli
+uv tool install git+https://github.com/TGM-HIT/moodle-cli
 
 mdl --help
 ```
 
-This is a regular `pyproject.toml`-based project, so other ways of installation (e.g. `pip install ./moodle-cli`) should also work.
+This is a regular `pyproject.toml`-based project, so other ways of installation (e.g. `pip install`) should also work.
 
 ## Module configuration files
 
