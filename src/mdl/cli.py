@@ -154,5 +154,44 @@ def upload(
             exit(f"unexpected response while processing {module_path}: {result}")
 
 
+@app.command()
+def list(
+    modules: Annotated[list[Path], typer.Argument(
+        help="the manifests specifying the modules to scan",
+        show_default=False,
+    )],
+    sort: Annotated[bool, typer.Option(
+        help="whether to print the files in alphabetical order",
+    )]=False,
+):
+    """
+    Lists files that contribute content to the specified modules. The files are the same types as
+    accepted by the `upload` command. The list of contributing files is constructed by taking all
+    `source`s and `attachments`.
+
+    A `.md` or `.typ` input file that does not specify itself as a source in its frontmatter is not
+    considered to contribute content.
+
+    Note that this does _not_ automatically consider imports and includes inside `.typ` files. Typst
+    files can add `<dependencies>` metadata to augment the list of files, but must do so manually
+    and need to take care about relative paths.
+    """
+
+    try:
+        module_metas = course.collect_metas(modules)
+    except course.CourseException as ex:
+        exit(*ex.args)
+
+    dependencies = set()
+    for module in module_metas:
+        dependencies.update(module.dependencies)
+
+    if sort:
+        dependencies = sorted(dependencies)
+
+    for path in dependencies:
+        print(path)
+
+
 if __name__ == "__main__":
     app()

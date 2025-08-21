@@ -35,6 +35,14 @@ class EditorContent:
         for i in range(len(self.attachments)):
             self.attachments[i] = _coerce_path(self.attachments[i])
 
+    @property
+    def dependencies(self) -> set[Path]:
+        dependencies = set()
+        dependencies.add(self.source)
+        dependencies.update(self.attachments)
+        # TODO Typst dependencies
+        return dependencies
+
 
 @dataclass(kw_only=True)
 class ModuleMeta:
@@ -62,6 +70,10 @@ class ModuleMeta:
     def __post_init__(self):
         self.intro = _coerce_editor_content(self.intro)
 
+    @property
+    def dependencies(self) -> set[Path]:
+        return self.intro.dependencies if self.intro is not None else set()
+
 
 @dataclass(kw_only=True)
 class AssignMeta(ModuleMeta):
@@ -74,6 +86,14 @@ class AssignMeta(ModuleMeta):
         for i in range(len(self.attachments)):
             self.attachments[i] = _coerce_path(self.attachments[i])
 
+    @property
+    def dependencies(self) -> set[Path]:
+        dependencies = super().dependencies
+        if self.activity is not None:
+            dependencies.update(self.activity.dependencies)
+        dependencies.update(self.attachments)
+        return dependencies
+
 
 @dataclass(kw_only=True)
 class FolderMeta(ModuleMeta):
@@ -83,6 +103,12 @@ class FolderMeta(ModuleMeta):
         super().__post_init__()
         for i in range(len(self.files)):
             self.files[i] = _coerce_path(self.files[i])
+
+    @property
+    def dependencies(self) -> set[Path]:
+        dependencies = super().dependencies
+        dependencies.update(self.files)
+        return dependencies
 
 
 @dataclass(kw_only=True)
@@ -97,6 +123,13 @@ class PageMeta(ModuleMeta):
         super().__post_init__()
         self.page = _coerce_editor_content(self.page)
 
+    @property
+    def dependencies(self) -> set[Path]:
+        dependencies = super().dependencies
+        if self.page is not None:
+            dependencies.update(self.page.dependencies)
+        return dependencies
+
 
 @dataclass(kw_only=True)
 class ResourceMeta(ModuleMeta):
@@ -105,6 +138,12 @@ class ResourceMeta(ModuleMeta):
     def __post_init__(self):
         super().__post_init__()
         self.file = _coerce_path(self.file)
+
+    @property
+    def dependencies(self) -> set[Path]:
+        dependencies = super().dependencies
+        dependencies.add(self.file)
+        return dependencies
 
 
 def collect_metas(modules: list[Path], verify_with=None) -> list[ModuleMeta]:
