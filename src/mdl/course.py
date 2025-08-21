@@ -39,7 +39,9 @@ class EditorContent:
         dependencies = set()
         dependencies.add(root/self.source)
         dependencies.update(root/att for att in self.attachments)
-        # TODO Typst dependencies
+        if self.source.suffix == '.typ':
+            dependencies.update(root/att for att in typst.attachments(root/self.source))
+            dependencies.update(root/dep for dep in typst.dependencies(root/self.source))
         return dependencies
 
 

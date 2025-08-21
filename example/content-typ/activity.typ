@@ -14,10 +14,6 @@
 
 #image("super-advocado.jpg", alt: "Advocado")
 
-```java
-public static void main(String[] args) {
-
-}
-```
+#include "code.typ"
 
 ...
