@@ -195,33 +195,35 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
         return meta
 
     module_metas = []
-    def collect(inputs, root=None):
-        for input_path in inputs:
-            if root is not None:
-                # nested input: interpret relative to root
-                input_path = root/input_path
-            meta = read_input(input_path)
-            root = input_path.parent
-            name = str(input_path)
+    def collect(input_path, root=None):
+        if root is not None:
+            # nested input: interpret relative to root
+            input_path = root/input_path
+        meta = read_input(input_path)
+        root = input_path.parent
+        name = str(input_path)
 
-            children = meta.pop('children', None)
+        children = meta.pop('children', None)
 
-            if 'mod' in meta:
-                if not meta['mod'].startswith('$'):
-                    meta = prepare_module_meta(meta)
-                elif meta['mod'] == '$section':
-                    meta = prepare_section_meta(meta)
-                else:
-                    raise ValueError(f"{name}: unknown special module type '{meta['mod']}'")
+        if 'mod' in meta:
+            if not meta['mod'].startswith('$'):
+                meta = prepare_module_meta(meta)
+            elif meta['mod'] == '$section':
+                meta = prepare_section_meta(meta)
+            else:
+                raise ValueError(f"{name}: unknown special module type '{meta['mod']}'")
 
-                module_metas.append((name, root, meta))
-            elif meta != {}:
-                raise ValueError(f"unexpected extra content in {name}: {meta}")
-            elif children is None:
-                raise ValueError(f"{name} contained neither a module nor children")
+            module_metas.append((name, root, meta))
+        elif meta != {}:
+            raise ValueError(f"unexpected extra content in {name}: {meta}")
+        elif children is None:
+            raise ValueError(f"{name} contained neither a module nor children")
 
-            if children is not None:
-                collect(children, root)
-    collect(modules)
+        if children is not None:
+            for input_path in children:
+                collect(input_path, root)
+
+    for input_path in modules:
+        collect(input_path)
 
     return module_metas
