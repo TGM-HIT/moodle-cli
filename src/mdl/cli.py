@@ -154,22 +154,21 @@ def upload(
     except course.CourseException as ex:
         exit(*ex.args)
 
-    for (module_path, module) in modules:
-        root = module_path.parent
+    for name, root, module in modules:
         if changes is not None:
             dependencies = module.dependencies(root)
             if dependencies.isdisjoint(changes):
-                print(f"{module_path}: skipping because no modifications were found")
+                print(f"{name}: skipping because no modifications were found")
                 continue
 
         if dry_run:
-            print(f"{module_path}: performing a dry-run, upload is skipped")
+            print(f"{name}: performing a dry-run, upload is skipped")
             continue
 
-        print(f"{module_path}: uploading...")
+        print(f"{name}: uploading...")
         result = moodle.upload_module(root, module)
         if result != 'ok':
-            exit(f"unexpected response while processing {module_path}: {result}")
+            exit(f"unexpected response while processing {name}: {result}")
 
 
 @app.command()
@@ -201,8 +200,7 @@ def dependencies(
         exit(*ex.args)
 
     dependencies = set()
-    for (module_path, module) in modules:
-        root = module_path.parent
+    for name, root, module in modules:
         dependencies.update(module.dependencies(root))
 
     if sort:

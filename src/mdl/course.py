@@ -198,6 +198,8 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
     def collect(inputs):
         for input_path in inputs:
             meta = read_input(input_path)
+            root = input_path.parent
+            name = str(input_path)
 
             children = meta.pop('children', None)
 
@@ -207,16 +209,15 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
                 elif meta['mod'] == '$section':
                     meta = prepare_section_meta(meta)
                 else:
-                    raise ValueError(f"{input_path}: unknown special module type '{meta['mod']}'")
+                    raise ValueError(f"{name}: unknown special module type '{meta['mod']}'")
 
-                module_metas.append((input_path, meta))
+                module_metas.append((name, root, meta))
             elif meta != {}:
-                raise ValueError(f"unexpected extra content in {input_path}: {meta}")
+                raise ValueError(f"unexpected extra content in {name}: {meta}")
             elif children is None:
-                raise ValueError(f"{input_path} contained neither a module nor children")
+                raise ValueError(f"{name} contained neither a module nor children")
 
             if children is not None:
-                root = input_path.parent
                 collect(root/f for f in children)
     collect(modules)
 
