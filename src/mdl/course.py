@@ -195,8 +195,11 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
         return meta
 
     module_metas = []
-    def collect(inputs):
+    def collect(inputs, root=None):
         for input_path in inputs:
+            if root is not None:
+                # nested input: interpret relative to root
+                input_path = root/input_path
             meta = read_input(input_path)
             root = input_path.parent
             name = str(input_path)
@@ -218,7 +221,7 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
                 raise ValueError(f"{name} contained neither a module nor children")
 
             if children is not None:
-                collect(root/f for f in children)
+                collect(children, root)
     collect(modules)
 
     return module_metas
