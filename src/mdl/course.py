@@ -195,13 +195,25 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
         return meta
 
     module_metas = []
-    def collect(input_path, root=None):
-        if root is not None:
-            # nested input: interpret relative to root
-            input_path = root/input_path
-        meta = read_input(input_path)
-        root = input_path.parent
-        name = str(input_path)
+    def collect(input_value, root=None, nesting_info=None):
+        if isinstance(input_value, dict):
+            # the top level inputs are paths, so we shouldn't get here without nesting info
+            assert nesting_info is not None
+            name, i = nesting_info
+            meta = input_value
+            # root remains the same; the input is relative to the same file
+            # name will be of the for "<inputfile>:children[i].children[j]"
+            if name.endswith("]"):
+                name = f"{name}.children[{i}]"
+            else:
+                name = f"{name}:children[{i}]"
+        else:
+            if root is not None:
+                # nested input: interpret relative to root
+                input_value = root/input_value
+            meta = read_input(input_value)
+            root = input_value.parent
+            name = str(input_value)
 
         children = meta.pop('children', None)
 
@@ -220,8 +232,8 @@ def collect_metas(modules: list[Path], verify_with=None) -> list[tuple[Path, Mod
             raise ValueError(f"{name} contained neither a module nor children")
 
         if children is not None:
-            for input_path in children:
-                collect(input_path, root)
+            for i, input_value in enumerate(children):
+                collect(input_value, root, (name, i))
 
     for input_path in modules:
         collect(input_path)
