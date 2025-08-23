@@ -102,12 +102,16 @@ intro:
     - ...
 ```
 
-An input file may also specify `children` to be treated as additional input files. This can be done in addition to defining a module configuration, or instead. For example instead of passing many many files to the `mdl upload` command, you can instead pass a single `list.yaml` file if you prefer.
+An input file may also specify `children` to be treated as additional inputs. This can be done in addition to defining a module configuration, or instead. For example instead of passing many many files to the `mdl upload` command, you can instead pass a single `list.yaml` file if you prefer.
+
+`children` may contain both file paths to additional files containing module configurations (or more children), and directly specified modules:
 
 ```yaml
-# optional; list of files to be treated as additional input files
+# optional; list of files and module definitions
 children:
 - <file name>
+- mod: <module name>
+  ...
 - ...
 ```
 
@@ -190,4 +194,4 @@ The data structure described above can be contained in different kinds of input 
 - `.md`: the file must start with a YAML front matter block, which is used for the module data. The front matter will usually refer to the file itself as some `source`.
 - `.typ`: the file must contain a `<frontmatter>` metadata element. The front matter will usually refer to the file itself as some `source`. When doing so, you can of course use `<attachments>` instead of adding the attachments to the module data.
 
-Input files can also have a `children` key containing a list of file names; these are recursively added to the input files.
+Input files can also have a `children` key containing a list of file names and module definitions; these are recursively added to the inputs.
