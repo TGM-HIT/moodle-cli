@@ -137,6 +137,10 @@ Beyond these, the following module-specific fields are supported:
   ```
 
 - Folders:
+
+  When specifying a list of files, the paths of files uploaded to a folder are preserved. For example, if you add `folder/file.txt` to your folder, then it will be nested in a `folder/` inside that module. There are two ways around this:
+  - define the module in the folder files reside in, so you can write `file.txt` instead of `folder/file.txt`
+  - use a dictionary instead of a list of files as demonstrated below. The keys are the destination file names, e.g. `file.txt: folder/file.txt`.
   ```yaml
   mod: folder
   ...
@@ -144,6 +148,10 @@ Beyond these, the following module-specific fields are supported:
   files:
     - <file name>
     - ...
+  # or: dictionary of destination and source file names in the folder
+  files:
+    dest.txt: src.txt
+    ...
   ```
 
 - Labels: no additional fields

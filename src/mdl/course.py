@@ -110,12 +110,19 @@ class AssignMeta(ModuleMeta):
 
 @dataclass(kw_only=True)
 class FolderMeta(ModuleMeta):
-    files: list[Path]
+    files: list[tuple[Path, Path]]
 
     def __post_init__(self):
         super().__post_init__()
-        for i in range(len(self.files)):
-            self.files[i] = _coerce_path(self.files[i])
+        if isinstance(self.files, list):
+            for i in range(len(self.files)):
+                f = _coerce_path(self.files[i])
+                self.files[i] = (f, f)
+        else:
+            self.files = [
+                (_coerce_path(k), _coerce_path(v))
+                for k, v in self.files.items()
+            ]
 
     def dependencies(self, root: Path) -> set[Path]:
         dependencies = super().dependencies(root)

@@ -1,3 +1,4 @@
+from collections import defaultdict
 from enum import Enum
 from pathlib import Path
 
@@ -28,15 +29,36 @@ class Mdl(Moodle):
         return module
 
     def upload_module(self, root: Path, module: ModuleMeta | SectionMeta):
-        def upload_files(files):
+        def upload_files(files: list[Path | tuple[Path, Path]]):
             if len(files) == 0:
                 return None
 
-            result = self.upload(*(
-                (f.name, open(root/f, 'rb'))
-                for f in set(files)
-            ))
-            itemid = result[0].itemid
+            batches = defaultdict(list)
+            for f in files:
+                if isinstance(f, tuple):
+                    # a name, file pair
+                    name, f = f
+                    batch, name = str(Path('/')/name.parent), name.name
+                    if batch != '/':
+                        # moodle requires trailing slashes
+                        batch += '/'
+                else:
+                    # assume the file goes into the '/' path
+                    batch = '/'
+                    name = f.name
+                # now we have
+                # - a batch with leading and trailing slash, e.g. /, /a/, /a/b/
+                # - a name that is only the name component of the full file path
+                # - a file f that can be resolved relative to the root
+                batches[batch].append((name, f))
+
+            itemid = 0
+            for path, batch in batches.items():
+                result = self.upload(itemid=itemid, filepath=path, *(
+                    (name, open(root/f, 'rb'))
+                    for name, f in batch
+                ))
+                itemid = result[0].itemid
             return itemid
 
         def prepare_editor(editor):
