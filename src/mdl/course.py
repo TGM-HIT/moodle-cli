@@ -126,7 +126,7 @@ class FolderMeta(ModuleMeta):
 
     def dependencies(self, root: Path) -> set[Path]:
         dependencies = super().dependencies(root)
-        dependencies.update(root/f for f in self.files)
+        dependencies.update(root/f for _, f in self.files)
         return dependencies
 
 
