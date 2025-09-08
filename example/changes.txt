@@ -1,2 +1,2 @@
-content-md/activity.md
-content-typ/code.typ
+content-md/../content-md/activity.md
+content-typ/../content-typ/code.typ
