@@ -147,7 +147,7 @@ def upload(
 
     if changes is not None:
         with open(changes, 'rt') as f:
-            changes = set(Path(line.rstrip('\r\n')) for line in f)
+            changes = set(Path(line.rstrip('\r\n')).resolve() for line in f)
 
     try:
         modules = course.collect_metas(modules, verify_with=moodle if verify else None)
@@ -156,7 +156,7 @@ def upload(
 
     for name, root, module in modules:
         if changes is not None:
-            dependencies = module.dependencies(root)
+            dependencies = {p.resolve() for p in module.dependencies(root)}
             if dependencies.isdisjoint(changes):
                 print(f"{name}: skipping because no modifications were found")
                 continue
