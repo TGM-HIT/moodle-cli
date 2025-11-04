@@ -77,7 +77,7 @@ def contents(
     Lists a course's sections and modules.
     """
     require_moodle()
-    sections = moodle.get_course_contents(2)
+    sections = moodle.get_course_contents(courseid)
     for section in sections:
         print(f"- {section.section}: {section.name} (ID={section.id}){" (hidden)" if not section.visible else ""}")
         for cm in section.modules:
